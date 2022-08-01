@@ -44,7 +44,6 @@ function _init()
 	camy = 0
 end
 
-
 function _draw()
 	cls()
 
@@ -84,6 +83,36 @@ function _draw()
 		spr(004, gui_lx + i * 8, gui_ly)
 		spr(049, gui_bx + i * 8, gui_by)
 	end 
+end
+
+function _update()
+	counter += 1
+	if (counter % 60 == 0 and tl==1) spawn_enemy() tl += 1
+
+	if (counter %30 == 0) foreach(enemy, enemy_fire)
+	foreach(bullet, move_bullet)
+	foreach(enemy_b, move_enemy_b)
+	foreach(enemy, check_range)
+	foreach(enemy, move_enemy)
+	player_movements()
+	enemy_counter()
+
+	cnt() -- check next tile
+	cent() -- check enemy next tile
+
+	if (flr(player.y / 64) == 1) then
+		gui_cely = 32
+		gui_sy = 0
+		gui_by = 8
+		gui_ly = 0
+	else
+		gui_cely = 35
+		gui_sy = 104
+		gui_by = 118
+		gui_ly = 110
+	end
+
+	if (player.reloading) player_reloading()
 end
 
 function cnt()
@@ -131,36 +160,6 @@ function cnt()
 	else
 		player.md = true
 	end
-end
-
-function _update()
-	counter += 1
-	if (counter % 60 == 0 and tl==1) spawn_enemy() tl += 1
-
-	if (counter %30 == 0) foreach(enemy, enemy_fire)
-	foreach(bullet, move_bullet)
-	foreach(enemy_b, move_enemy_b)
-	foreach(enemy, check_range)
-	foreach(enemy, move_enemy)
-	player_movements()
-	enemy_counter()
-
-	cnt() -- check next tile
-	cent() -- check enemy next tile
-
-	if (flr(player.y / 64) == 1) then
-		gui_cely = 32
-		gui_sy = 0
-		gui_by = 8
-		gui_ly = 0
-	else
-		gui_cely = 35
-		gui_sy = 104
-		gui_by = 118
-		gui_ly = 110
-	end
-
-	if (player.reloading) player_reloading()
 end
 
 function cent()
@@ -288,42 +287,41 @@ function player_movements()
 		if door then
 			if (tile == 028) second_floor=true
 
-			player.lx=player.x
-			player.ly=player.y
-			player.x=32
-			player.y=203
-			camy=128
-
+			player.lx = player.x
+			player.ly = player.y
+			player.x = 32
+			player.y = 203
+			camy = 128
 			reset_gui()
 		end
 
 		if tile == 053 then 
-			player.x=player.lx
-			player.y=player.ly
-			player.lx=0
-			player.ly=0
-			camy=0
+			player.x = player.lx
+			player.y = player.ly
+			player.lx = 0
+			player.ly = 0
+			camy = 0
 			reset_gui()
 		end
 	end
 end
 
 function fire()
-   sfx(00)
-   player.b -= 1
-   if (player.b == 0) player.reloading = true
+	sfx(00)
+	player.b -= 1
+	if (player.b == 0) player.reloading = true
 
-   local b = {
-	  x = player.x,
-	  y = player.y,
-	  sx = player.x,
-	  sy = player.y,
-	  s = 003,
-	  f = player.facing,
-   }
+	local b = {
+		x = player.x,
+		y = player.y,
+		sx = player.x,
+		sy = player.y,
+		s = 003,
+		f = player.facing,
+	}
 
-   add(bullet,b)
-   return b
+	add(bullet,b)
+	return b
 end
 
 function player_reloading()
@@ -332,132 +330,132 @@ function player_reloading()
 end
 
 function move_bullet(b)
- if (b.f == "l") b.x -= 2
- if (b.f == "r") b.x += 2
- if (b.f == "u") b.y -= 2
- if (b.f == "d") b.y += 2
- if (b.f == "dl") b.x -= 2 b.y += 2
- if (b.f == "dr") b.x += 2 b.y += 2
- if (b.f == "ul") b.x -= 2 b.y -= 2
- if (b.f == "ur") b.x += 2 b.y -= 2
+	if (b.f == "l") b.x -= 2
+	if (b.f == "r") b.x += 2
+	if (b.f == "u") b.y -= 2
+	if (b.f == "d") b.y += 2
+	if (b.f == "dl") b.x -= 2 b.y += 2
+	if (b.f == "dr") b.x += 2 b.y += 2
+	if (b.f == "ul") b.x -= 2 b.y -= 2
+	if (b.f == "ur") b.x += 2 b.y -= 2
 
- for e in all(enemy) do
-   if
-	  flr(e.x/8) == flr(b.x/8) and
-	  flr(e.y/8) == flr(b.y/8) then
+	for e in all(enemy) do
+		if
+			flr(e.x/8) == flr(b.x/8) and
+			flr(e.y/8) == flr(b.y/8) then
 
-	  del(enemy,e)
-	  del(bullet,b) 
-   end
- end
+			del(enemy,e)
+			del(bullet,b) 
+		end
+	 end
 
- if (b.x > b.sx + 25) del(bullet, b)
- if (b.x < b.sx - 25) del(bullet, b)
- if (b.y < b.sy - 25) del(bullet, b)
- if (b.y > b.sy + 25) del(bullet, b)
+	if (b.x > b.sx + 25) del(bullet, b)
+	if (b.x < b.sx - 25) del(bullet, b)
+	if (b.y < b.sy - 25) del(bullet, b)
+	if (b.y > b.sy + 25) del(bullet, b)
 end
 -->8
 -- enemies
 
 function draw_enemy(e)
-   spr(e.s,e.x,e.y)
+	spr(e.s,e.x,e.y)
 end
 
 function move_enemy(e)
-   if e.ep then
-	  if e.x <= e.px and e.mcd == false and e.mr then
-		 e.x += 2
-		 if (e.x >= e.px) e.x = e.px e.mcd = true
-	  end
+	if e.ep then
+		if e.x <= e.px and e.mcd == false and e.mr then
+			e.x += 2
+			if (e.x >= e.px) e.x = e.px e.mcd = true
+		end
 
-	  if e.x >= e.px and e.mcd == false and e.ml then
-		 e.x -= 2
-		 if (e.x <= e.px) e.x = e.px e.mcd = true
-	  end
-   end
+		if e.x >= e.px and e.mcd == false and e.ml then
+			e.x -= 2
+			if (e.x <= e.px) e.x = e.px e.mcd = true
+		end
+	end
 
-   if (e.mcd and e.c % 60 == 0) e.mcd = false
+	if (e.mcd and e.c % 60 == 0) e.mcd = false
 end
 
 
 function draw_enemy_b(eb)
-   spr(eb.s,eb.x,eb.y)
+	spr(eb.s,eb.x,eb.y)
 end
 
 function move_enemy_b(eb)
-   if (eb.t == "up") eb.y -= 1 
-   if (eb.t == "down") eb.y += 1
+	if (eb.t == "up") eb.y -= 1 
+	if (eb.t == "down") eb.y += 1
 
-   if
-	  flr(eb.x / 8) == flr(player.x / 8) and
-	  flr(eb.y / 8) == flr(player.y / 8) then
+	if
+		flr(eb.x / 8) == flr(player.x / 8) and
+		flr(eb.y / 8) == flr(player.y / 8) then
 
-	  player.l -= 1
-	  del(enemy_b, eb)
-   end
+		player.l -= 1
+		del(enemy_b, eb)
+	end
 
-   if (eb.x > eb.sx + 25) del(enemy_b, eb)
-   if (eb.x < eb.sx - 25) del(enemy_b, eb)
-   if (eb.y < eb.sy - 25) del(enemy_b, eb)
-   if (eb.y > eb.sy + 25) del(enemy_b, eb)
+	if (eb.x > eb.sx + 25) del(enemy_b, eb)
+	if (eb.x < eb.sx - 25) del(enemy_b, eb)
+	if (eb.y < eb.sy - 25) del(enemy_b, eb)
+	if (eb.y > eb.sy + 25) del(enemy_b, eb)
 end
 
 function enemy_fire(e)
-   if e.ep and e.mcd then
-	  local eb = {
-		 x = e.x,
-		 y = e.y,
-		 sx = e.x,
-		 sy = e.y,
-		 s = 003,
-		 t = (e.y < e.py) and "down" or "up"
-	  }
+	if e.ep and e.mcd then
+		local eb = {
+			x = e.x,
+			y = e.y,
+			sx = e.x,
+			sy = e.y,
+			s = 003,
+			t = (e.y < e.py) and "down" or "up"
+		}
 
-	  add(enemy_b,eb)
-	  return eb
-   end
+		add(enemy_b,eb)
+		return eb
+	end
 end
 
 function spawn_enemy()
-   local e = {
-	  x = 18,
-	  y = 42,
-	  s = 032,
-	  v = 2,
-	  c = 0,
-	  mcd = false,
-	  ep = false,
-	  px = 0,
-	  py = 0,
-	  pa = 0,
-	  pb = 0,
-	  pe = 0,
-	  pf = 0,
-	  ml = true,
-	  mr = true
-   }
-   add(enemy,e)
+	local e = {
+		x = 18,
+		y = 42,
+		s = 032,
+		v = 2,
+		c = 0,
+		mcd = false,
+		ep = false,
+		px = 0,
+		py = 0,
+		pa = 0,
+		pb = 0,
+		pe = 0,
+		pf = 0,
+		ml = true,
+		mr = true
+	}
+	add(enemy,e)
 
-   local e = {
-	  x = 100,
-	  y = 32,
-	  s = 032,
-	  v = 2,
-	  c = 0,
-	  mcd = false,
-	  ep = false,
-	  px = 0,
-	  py = 0,
-	  pa = 0,
-	  pb = 0,
-	  pe = 0,
-	  pf = 0,
-	  ml = true,
-	  mr = true,
-   }
-   add(enemy,e)
+	local e = {
+		x = 100,
+		y = 32,
+		s = 032,
+		v = 2,
+		c = 0,
+		mcd = false,
+		ep = false,
+		px = 0,
+		py = 0,
+		pa = 0,
+		pb = 0,
+		pe = 0,
+		pf = 0,
+		ml = true,
+		mr = true,
+	}
+	add(enemy,e)
 
-   return e
+	return e
 end
 __gfx__
 00ffff0000ffff0000ffff0000000000000000006666666666666666aaa66666aaa66aaa766666666666666676666666dddddddddddddddd0000000000000000
